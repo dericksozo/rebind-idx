@@ -11,7 +11,7 @@ interface IWatchlistRegistry {
 /// @notice Emits rows for ERC-20 transfers that touch watchlisted addresses on Base Sepolia.
 contract RebindERC20Listener is ERC20$OnTransferEvent {
     /// @dev Hard-coded Base Sepolia registry address. Replace with the deployed registry for production use.
-    address public constant REGISTRY = 0x0000000000000000000000000000000000000000;
+    address public constant REGISTRY = 0xE47EA398436E99e1b7639722bB7062F05F9225ae;
 
     /// @notice Emitted when a qualifying ERC-20 transfer is observed.
     /// @param chainId The chain identifier where the transfer occurred.
