@@ -24,11 +24,12 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
         address token,
         address from,
         address to,
-        uint256 value
+        uint256 value,
+        uint256 blockNumber
     );
 
     /// @inheritdoc ERC20$OnTransferEvent
-    function onTransferEvent(EventContext memory, ERC20$TransferEventParams memory params) external override {
+    function onTransferEvent(EventContext memory ctx, ERC20$TransferEventParams memory params) external override {
         if (REGISTRY.code.length == 0) {
             return;
         }
@@ -37,10 +38,11 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
         if (registry.isWatched(params.from) || registry.isWatched(params.to)) {
             emit RebindTransfer(
                 uint64(block.chainid),
-                msg.sender,
+                ctx.txn.call.callee(),
                 params.from,
                 params.to,
-                params.value
+                params.value,
+                block.number
             );
         }
     }
