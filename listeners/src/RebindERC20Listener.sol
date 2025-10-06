@@ -25,7 +25,8 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
         address from,
         address to,
         uint256 value,
-        uint256 blockNumber
+        uint256 blockNumber,
+        bytes32 txnHash
     );
 
     /// @inheritdoc ERC20$OnTransferEvent
@@ -42,7 +43,8 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
                 params.from,
                 params.to,
                 params.value,
-                block.number
+                block.number,
+                ctx.txn.hash()
             );
         }
     }
