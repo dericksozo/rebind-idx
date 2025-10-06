@@ -52,3 +52,4 @@ To deploy to Base Sepolia with Foundry:
    ```
 
 After deployment, connect to the provisioned Postgres instance to query `rebind_transfer` and confirm that only transfers involving watched addresses are stored.
+
