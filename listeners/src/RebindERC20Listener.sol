@@ -36,6 +36,7 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
         }
 
         IWatchlistRegistry registry = IWatchlistRegistry(REGISTRY);
+        
         if (registry.isWatched(params.from) || registry.isWatched(params.to)) {
             emit RebindTransfer(
                 uint64(block.chainid),
