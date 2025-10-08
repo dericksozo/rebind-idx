@@ -13,6 +13,19 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
     /// @dev Hard-coded Base Sepolia registry address. Replace with the deployed registry for production use.
     address public constant REGISTRY = 0xE47EA398436E99e1b7639722bB7062F05F9225ae;
 
+    /// @dev Common burn sink used by some tokens in addition to address(0)
+    address private constant DEAD = 0x000000000000000000000000000000000000dEaD;
+
+    // Transfer type labels
+    string private constant TT_TRANSFER = "TRANSFER";
+    string private constant TT_MINT = "MINT";
+    string private constant TT_BURN = "BURN";
+
+    // Watchlist side labels
+    string private constant WS_FROM = "FROM";
+    string private constant WS_TO = "TO";
+    string private constant WS_BOTH = "BOTH";
+
     /// @notice Emitted when a qualifying ERC-20 transfer is observed.
     /// @param chainId The chain identifier where the transfer occurred.
     /// @param token The ERC-20 token contract that emitted the transfer.
@@ -26,7 +39,9 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
         address to,
         uint256 value,
         uint256 blockNumber,
-        bytes32 txnHash
+        bytes32 txnHash,
+        string transferType,
+        string watchedSide
     );
 
     /// @inheritdoc ERC20$OnTransferEvent
@@ -36,8 +51,18 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
         }
 
         IWatchlistRegistry registry = IWatchlistRegistry(REGISTRY);
-        
-        if (registry.isWatched(params.from) || registry.isWatched(params.to)) {
+
+        bool watchedFrom = registry.isWatched(params.from);
+        bool watchedTo = registry.isWatched(params.to);
+
+        if (watchedFrom || watchedTo) {
+            string memory transferType = TT_TRANSFER;
+            if (params.from == address(0)) {
+                transferType = TT_MINT;
+            } else if (params.to == address(0) || params.to == DEAD) {
+                transferType = TT_BURN;
+            }
+            string memory watchedSide = watchedFrom && watchedTo ? WS_BOTH : (watchedFrom ? WS_FROM : WS_TO);
             emit RebindTransfer(
                 uint64(block.chainid),
                 ctx.txn.call.callee(),
@@ -45,7 +70,9 @@ contract RebindERC20Listener is ERC20$OnTransferEvent {
                 params.to,
                 params.value,
                 block.number,
-                ctx.txn.hash()
+                ctx.txn.hash(),
+                transferType,
+                watchedSide
             );
         }
     }

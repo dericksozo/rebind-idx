@@ -11,4 +11,6 @@ export const rebindTransfer = table("rebind_transfer", {
   value: db.uint256('value'),
   blockNumber: db.uint256('block_number'),
   txnHash: db.bytes32('txn_hash'),
+  transferType: t.text('transfer_type'),
+  watchedSide: t.text('watched_side'),
 })
