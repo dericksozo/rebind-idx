@@ -9,9 +9,8 @@ app.get("/*", async (c) => {
     const result = await db
       .client(c)
       .select()
-      .from(rebindTransfer)
-      .limit(5);
-
+      .from(rebindTransfer);
+      
     return Response.json({
       result: result,
     });
